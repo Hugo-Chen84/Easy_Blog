@@ -1,165 +1,117 @@
 # Easy Blog
 
-一个用 React + Node.js + Express + SQLite 开发的博客系统。
+> 一个由 CS 小白从零搭建的简易博客系统，记录技术成长的点滴。
 
 ## 🌐 在线访问
 
 **公网地址：** http://47.97.16.173:5000
 
-注册账号即可使用博客功能！
+### 默认管理员账号
+- **用户名：** 管理员
+- **密码：** admin123456
 
-## ✨ 功能
+---
 
-- 用户注册/登录
-- 发表博客文章
-- 搜索博客
-- 点赞/取消点赞
-- 评论功能
-- 科技感页面设计 + 动画背景
+## ✨ 已实现功能
+
+| 模块 | 功能 |
+|------|------|
+| 👤 用户 | 用户注册 / 登录 / JWT 鉴权 / 用户名不重复校验 |
+| 🖼️ 头像 | 默认头像 + 自定义头像上传（multer）+ 加载失败自动回退 |
+| ✍️ 博客 | 发布博客 / Markdown 编辑器 / 博客详情浏览 |
+| 🔍 搜索 | 全文搜索（按作者名 / 标题 / 内容，按权重排序 + 分页） |
+| 📌 置顶 | 欢迎帖自动置顶显示 |
+| ❤️ 互动 | 点赞 / 取消点赞 / 评论 |
+| 👁️ 浏览量 | 每篇博客独立访问计数 |
+| 📱 响应式 | PC + 移动端适配（768px / 480px 两个断点） |
+| 🐙 GitHub | 右上角跳转源码仓库 + GitHub OAuth Device Flow 登录 |
+
+---
 
 ## 🛠 技术栈
 
-| 前端 | 后端 |
+| 层级 | 技术 |
 |------|------|
-| React 18 | Node.js + Express |
-| React Router | Sequelize (SQLite) |
-| Axios | bcryptjs (密码加密) |
-| Vite | jsonwebtoken (JWT) |
+| **前端** | React 18 + React Router + Axios + React Markdown（支持 GFM） |
+| **构建** | Vite 6 |
+| **后端** | Node.js + Express 4 |
+| **数据库** | SQLite + Sequelize ORM |
+| **鉴权** | jsonwebtoken (JWT) + bcryptjs（密码加密） |
+| **文件上传** | multer |
+| **部署** | pm2 进程守护 + 一键部署脚本 |
+| **样式** | 原生 CSS（科技感渐变 / 发光动效） |
 
-## 💻 本地开发
+---
+
+## 💻 本地开发部署
 
 ### 前置条件
-- Node.js 18 或更高版本
+- Node.js **18** 或更高版本
+- Git（可选，用来 clone 代码）
 
-### 安装依赖
-
-```bash
-# 方式 1: 用根目录脚本
-npm install
-
-# 方式 2: 分别安装
-cd backend && npm install
-cd ../frontend && npm install
-```
-
-### 启动开发服务器
+### 步骤 1：获取代码
 
 ```bash
-# 启动后端 (新终端窗口)
-cd backend
-npm install   # 如果还没安装
-node server.js
-
-# 启动前端 (另一个终端窗口)
-cd frontend
-npm install   # 如果还没安装
-npm run dev
-```
-
-然后访问: http://localhost:3000
-
-后端 API 运行在: http://localhost:5000
-
-## 🚀 部署到阿里云 (推荐，国内访问快)
-
-### 方式 A：在阿里云买一台 ECS 云服务器（最简单）
-
-**前提条件**
-
-1. 登录阿里云官网: https://www.aliyun.com
-2. 购买一台 **ECS 云服务器**
-   - 推荐配置: **1 核 2GB** 或 **2 核 4GB**
-   - 系统: **Ubuntu 22.04 LTS** 或 **CentOS 7/8**
-   - 价格: 新用户约 ¥99/年，学生更便宜
-3. 购买时记得：
-   - 勾选 **"分配公网 IP"**
-   - **安全组**开放端口: **22 (SSH)**, **80 (HTTP)**, **443 (HTTPS)**, **5000**
-
-**部署步骤（共 3 步）**
-
-**步骤 1：用 SSH 连接你的服务器**
-
-在你本地电脑上打开 PowerShell 或终端：
-```bash
-# 假设你的服务器公网 IP 是 123.45.67.89
-ssh root@123.45.67.89
-# 输入密码或用密钥登录
-```
-
-**步骤 2：上传代码到服务器**
-
-在服务器上执行：
-```bash
-# 从 GitHub 下载你的代码（推荐）
 git clone https://github.com/Hugo-Chen84/Easy_Blog.git
 cd Easy_Blog
-
-# 运行一键部署脚本
-chmod +x deploy.sh
-sudo bash deploy.sh
 ```
 
-等待几分钟，部署完成后访问：
-```
-http://你的服务器公网IP:5000
+### 步骤 2：安装依赖
 
-# 例如: http://123.45.67.89:5000
-```
-
-**步骤 3：配置 Nginx（可选，但推荐）**
-
-如果你想让用户直接访问 IP 而不是加端口 5000：
 ```bash
-# 把项目里的 nginx.conf 复制到 Nginx 目录
-sudo cp /root/Easy_Blog/nginx.conf /etc/nginx/conf.d/easy-blog.conf
+# 进入后端目录安装
+cd backend
+npm install
 
-# 重启 Nginx
-sudo systemctl restart nginx
+# 进入前端目录安装
+cd ../frontend
+npm install
 ```
 
-然后就能直接访问: `http://你的公网IP`
+### 步骤 3：构建前端
+
+```bash
+# 在 frontend 目录下
+npm run build
+```
+
+构建产物会生成到 `frontend/dist`，由后端 Express 作为静态资源托管。
+
+### 步骤 4：启动后端服务器
+
+```bash
+# 回到项目根目录，然后进入 backend
+cd backend
+node server.js
+```
+
+### 步骤 5：访问
+
+- 博客首页：http://localhost:5000
+- 后端 API 端口：**5000**
+
+首次启动时，系统会自动：
+1. 创建 SQLite 数据库表（`backend/database.sqlite`）
+2. 创建管理员账号（用户名：**管理员**，密码：**admin123456**）
+3. 创建一篇欢迎置顶帖
 
 ---
 
-### 方式 B：使用阿里云容器服务（更专业）
+## 🌤️ 启用 GitHub 登录（可选）
 
-如果你了解 Docker，可以用容器化部署：
+在 `backend` 目录下创建 `.env` 文件：
 
-```bash
-# 构建镜像
-docker build -t easy-blog:latest .
-
-# 运行容器
-docker run -d --name easy-blog \
-  -p 5000:5000 \
-  -v $(pwd)/data:/app/data \
-  --restart unless-stopped \
-  easy-blog:latest
+```env
+GITHUB_CLIENT_ID=你的GitHubClientID
+GITHUB_CLIENT_SECRET=你的GitHubClientSecret
+SESSION_SECRET=随便写一串复杂字符串
 ```
 
----
-
-## 🔄 以后修改代码如何同步到阿里云服务器？
-
-**方法：在你的电脑上修改 → push 到 GitHub → 服务器上 pull 更新**
+在 GitHub 上创建 OAuth App 并获取 Client ID 与 Secret，然后重启服务：
 
 ```bash
-# 在你的本地电脑修改完代码后
-git add .
-git commit -m "更新了首页样式"
-git push
-
-# 然后 SSH 登录服务器
-ssh root@你的服务器IP
-
-# 在服务器上拉取最新代码并重启
-cd Easy_Blog
-git pull
-npm install   # 如果有新依赖
 pm2 restart easy-blog
 ```
-
-就这么简单！
 
 ---
 
@@ -169,35 +121,72 @@ pm2 restart easy-blog
 Easy_Blog/
 ├── frontend/            # React 前端
 │   ├── src/
-│   │   ├── components/  # 公共组件 (导航栏)
-│   │   └── pages/       # 页面 (首页/登录/注册/详情/发布)
+│   │   ├── components/  # 公共组件（导航栏 Navbar）
+│   │   └── pages/       # 页面（Home / Login / Register / BlogDetail / CreateBlog）
+│   ├── public/          # 静态资源（背景图片）
 │   └── package.json
 ├── backend/             # Node.js 后端
 │   ├── src/
-│   │   ├── models/      # 数据库模型 (User/Blog/Comment/Like)
-│   │   └── routes/      # API 路由 (auth/blog)
+│   │   ├── models/      # 数据库模型（User / Blog / Comment / Like）
+│   │   └── routes/      # API 路由（auth / blog）
+│   ├── uploads/         # 用户上传的头像文件（自动创建，不上传 git）
 │   └── server.js        # 服务器入口
-├── pictures/            # 背景图片
-├── package.json         # 根目录部署脚本
-├── Dockerfile           # 容器镜像配置 (阿里云容器服务)
+├── package.json         # 根目录配置
 ├── nginx.conf           # Nginx 反向代理配置
 ├── deploy.sh            # 阿里云 ECS 一键部署脚本
-├── .dockerignore        # Docker 忽略文件
 └── README.md
 ```
 
-## 🔌 API 接口说明
+---
 
-所有接口以 `/api` 开头，前后端同源部署后自动工作。
+## 🔌 API 接口速查
+
+所有接口以 `/api` 开头，需鉴权的接口须在请求头中携带：`Authorization: Bearer <token>`
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | POST | `/api/auth/register` | 用户注册 |
-| POST | `/api/auth/login` | 用户登录 |
-| GET | `/api/blogs` | 获取所有博客 |
-| GET | `/api/blogs/search?keyword=xxx` | 搜索博客 |
-| GET | `/api/blogs/:id` | 获取博客详情 |
-| POST | `/api/blogs` | 发布新博客 (需登录) |
+| POST | `/api/auth/login` | 用户登录（返回 JWT） |
+| GET  | `/api/auth/me` | 获取当前用户信息 |
+| POST | `/api/auth/upload-avatar` | 上传头像（需登录） |
+| GET  | `/api/auth/github-config` | GitHub 登录是否启用 |
+| POST | `/api/auth/github-login` | GitHub Device Flow 登录 |
+| GET  | `/api/blogs` | 获取博客列表（支持分页 page + pageSize） |
+| GET  | `/api/blogs/search?keyword=xxx` | 搜索博客（按作者 / 标题 / 内容） |
+| GET  | `/api/blogs/:id` | 获取博客详情 + 评论（访问次数 +1） |
+| POST | `/api/blogs` | 发布新博客（需登录） |
 | POST | `/api/blogs/:id/like` | 点赞博客 |
 | DELETE | `/api/blogs/:id/like` | 取消点赞 |
 | POST | `/api/blogs/:id/comments` | 添加评论 |
+| GET  | `/api/health` | 健康检查 |
+
+---
+
+## 🔄 更新代码后如何同步服务器
+
+```bash
+# 本地修改完成后
+git add .
+git commit -m "更新了xxx功能"
+git push
+
+# SSH 登录服务器
+ssh root@47.97.16.173
+cd Easy_Blog
+
+# 方式 A（推荐）：一键部署脚本
+chmod +x deploy.sh
+./deploy.sh
+
+# 方式 B：手动更新
+git pull
+cd backend && npm install
+cd ../frontend && npm install && npm run build
+pm2 restart easy-blog
+```
+
+---
+
+## 📝 License
+
+MIT © 2026 Easy Blog
