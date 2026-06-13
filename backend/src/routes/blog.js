@@ -1,6 +1,9 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
 import { Op } from 'sequelize'
+import multer from 'multer'
+import path from 'path'
+import fs from 'fs'
 import { models } from '../models/index.js'
 
 const router = express.Router()
@@ -22,18 +25,38 @@ const authMiddleware = (req, res, next) => {
   }
 }
 
+// 在 authMiddleware 基础上，额外加载完整 User 信息（含 isAdmin 字段）
+const authWithUser = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) {
+    return res.status(401).json({ message: '请先登录' })
+  }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET)
+    const user = await User.findByPk(decoded.id)
+    if (!user) {
+      return res.status(404).json({ message: '用户不存在' })
+    }
+    req.user = user.toJSON()
+    next()
+  } catch (err) {
+    res.status(401).json({ message: 'token 无效' })
+  }
+}
+
 // 获取用户默认头像（用于老用户）
 const getDefaultAvatar = (username) => {
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`
 }
 
-// 格式化用户信息（确保有头像）
+// 格式化用户信息（确保有头像 + isAdmin）
 const formatUser = (user) => {
   if (!user) return null
   return {
     id: user.id,
     username: user.username,
-    avatar: user.avatar || getDefaultAvatar(user.username)
+    avatar: user.avatar || getDefaultAvatar(user.username),
+    isAdmin: !!user.isAdmin
   }
 }
 
@@ -283,6 +306,72 @@ router.post('/:id/comments', authMiddleware, async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: '评论失败', error: err.message })
   }
+})
+
+// 删除博客（作者本人或管理员可删除）
+router.delete('/:id', authWithUser, async (req, res) => {
+  try {
+    const blogId = req.params.id
+    const userId = req.user.id
+    const isAdmin = !!req.user.isAdmin
+
+    const blog = await Blog.findByPk(blogId)
+    if (!blog) {
+      return res.status(404).json({ message: '博客不存在' })
+    }
+
+    // 权限检查：作者本人或管理员
+    if (blog.authorId !== userId && !isAdmin) {
+      return res.status(403).json({ message: '没有权限删除这篇博客' })
+    }
+
+    // 删除评论和点赞
+    await Comment.destroy({ where: { blogId } })
+    await Like.destroy({ where: { blogId } })
+    await blog.destroy()
+
+    res.json({ message: '删除成功' })
+  } catch (err) {
+    res.status(500).json({ message: '删除失败', error: err.message })
+  }
+})
+
+// 博客内容图片上传
+// 通过 req.app.get('blogImagesDir') 读取 server.js 中定义的目录
+const blogImageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = req.app.get('blogImagesDir') || path.join(process.cwd(), 'backend', 'uploads', 'blog-images')
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+    cb(null, dir)
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase()
+    cb(null, `blog-${Date.now()}${ext}`)
+  }
+})
+const blogImageUpload = multer({
+  storage: blogImageStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    const ext = path.extname(file.originalname).toLowerCase()
+    if (allowed.includes(ext)) cb(null, true)
+    else cb(new Error('只支持图片文件'))
+  }
+})
+
+// 上传博客图片（登录用户）
+router.post('/upload-image', authMiddleware, (req, res) => {
+  blogImageUpload.single('image')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message || '上传失败' })
+    }
+    if (!req.file) {
+      return res.status(400).json({ message: '请选择图片文件' })
+    }
+    const imageUrl = `/uploads/blog-images/${req.file.filename}`
+    res.json({ url: imageUrl, message: '上传成功' })
+  })
 })
 
 export default router

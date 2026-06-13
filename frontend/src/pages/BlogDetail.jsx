@@ -5,6 +5,15 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import './BlogDetail.css'
 
+// 判断内容是否为 HTML（富文本模式产生的）
+function isHtmlContent(content) {
+  if (!content) return false
+  const trimmed = content.trim()
+  // 简单检测：包含常见 HTML 标签
+  const htmlTags = /<(div|p|span|h[1-6]|strong|em|b|i|u|br|ul|ol|li|a|img|pre|code|blockquote|table|tr|td|th)[^>]*>/i
+  return htmlTags.test(trimmed)
+}
+
 function BlogDetail({ user }) {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -12,6 +21,7 @@ function BlogDetail({ user }) {
   const [loading, setLoading] = useState(true)
   const [comment, setComment] = useState('')
   const [isLiked, setIsLiked] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     fetchBlog()
@@ -75,8 +85,39 @@ function BlogDetail({ user }) {
     }
   }
 
+  const handleDelete = async () => {
+    if (!user) {
+      alert('请先登录')
+      return
+    }
+    if (!window.confirm('确定删除这篇博客吗？此操作不可恢复。')) {
+      return
+    }
+
+    setDeleting(true)
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(`/api/blogs/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      alert('删除成功')
+      navigate('/')
+    } catch (err) {
+      alert('删除失败：' + (err.response?.data?.message || err.message))
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   const getDefaultAvatar = (username) => {
     return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`
+  }
+
+  // 判断当前用户是否有权限删除
+  const canDelete = () => {
+    if (!user || !blog) return false
+    // 作者本人或管理员
+    return (blog.author?.id === user.id) || (user.isAdmin === true) || (user.isAdmin === 'true')
   }
 
   if (loading) {
@@ -109,16 +150,23 @@ function BlogDetail({ user }) {
                 <span className="blog-author">作者: {blog.author?.username || '匿名'}</span>
                 <span className="blog-date">{new Date(blog.createdAt).toLocaleString()}</span>
                 <span className="blog-view-count">👁️ 浏览 {blog.viewCount || 0}</span>
+                {blog.isPinned && <span className="pinned-badge">📌 置顶</span>}
               </div>
             </div>
           </div>
 
+          {/* 博客正文：根据内容自动选择渲染方式 */}
           <div className="blog-body">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {blog.content}
-            </ReactMarkdown>
+            {isHtmlContent(blog.content) ? (
+              // 富文本模式：直接渲染 HTML
+              <div className="rich-content" dangerouslySetInnerHTML={{ __html: blog.content }} />
+            ) : (
+              // Markdown 模式
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{blog.content}</ReactMarkdown>
+            )}
           </div>
 
+          {/* 操作按钮区 */}
           <div className="blog-actions">
             <button
               onClick={handleLike}
@@ -126,6 +174,16 @@ function BlogDetail({ user }) {
             >
               {isLiked ? '❤️ 已点赞' : '🤍 点赞'} ({blog.likes?.length || 0})
             </button>
+
+            {canDelete() && (
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="delete-btn"
+              >
+                {deleting ? '删除中...' : '🗑️ 删除博客'}
+              </button>
+            )}
           </div>
         </article>
 

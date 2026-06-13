@@ -156,11 +156,12 @@ router.post('/github-login', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        avatar: user.avatar || getDefaultAvatar(user.username)
+        avatar: user.avatar || getDefaultAvatar(user.username),
+        isAdmin: !!user.isAdmin
       }
     })
   } catch (err) {
-    res.status(500).json({ message: 'GitHub 登录失败：' + err.message })
+    res.status(500).json({ message: 'GitHub 登录失败: ' + err.message })
   }
 })
 
@@ -209,7 +210,8 @@ router.post('/register', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        avatar: user.avatar
+        avatar: user.avatar,
+        isAdmin: !!user.isAdmin
       }
     })
   } catch (err) {
@@ -251,7 +253,8 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        avatar: avatar
+        avatar: avatar,
+        isAdmin: !!user.isAdmin
       }
     })
   } catch (err) {
@@ -281,7 +284,8 @@ router.get('/me', async (req, res) => {
     res.json({
       id: user.id,
       username: user.username,
-      avatar: avatar
+      avatar: avatar,
+      isAdmin: !!user.isAdmin
     })
   } catch (err) {
     res.status(401).json({ message: 'token 无效' })

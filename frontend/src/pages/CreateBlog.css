@@ -49,6 +49,33 @@
   gap: 10px;
 }
 
+/* 编辑器模式切换按钮 */
+.mode-toggle {
+  padding: 10px 18px;
+  background: rgba(12, 12, 30, 0.5);
+  border: 1px solid rgba(123, 44, 191, 0.35);
+  border-radius: 20px;
+  color: #c77dff;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.mode-toggle:hover {
+  background: rgba(123, 44, 191, 0.2);
+  border-color: #7b2cbf;
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(123, 44, 191, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .toggle-btn {
   padding: 10px 20px;
   background: rgba(12, 12, 30, 0.4);

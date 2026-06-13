@@ -267,6 +267,149 @@
   color: #ff5757;
 }
 
+/* 删除按钮 */
+.delete-btn {
+  margin-left: 12px;
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: rgba(255, 87, 87, 0.1);
+  border: 1px solid rgba(255, 87, 87, 0.35);
+  color: #ff5757;
+  cursor: pointer;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: rgba(255, 87, 87, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(255, 87, 87, 0.35);
+}
+
+.delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 置顶徽章 */
+.pinned-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: linear-gradient(135deg, #ff9500, #ff6b00);
+  color: #fff;
+  font-size: 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-left: 4px;
+}
+
+/* 富文本编辑器内容 */
+.rich-content {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.rich-content h1,
+.rich-content h2,
+.rich-content h3,
+.rich-content h4 {
+  color: #fff;
+  margin: 24px 0 12px;
+  font-weight: 700;
+}
+
+.rich-content h1 { font-size: 28px; }
+.rich-content h2 { font-size: 24px; color: #00d4ff; }
+.rich-content h3 { font-size: 20px; }
+
+.rich-content p {
+  margin-bottom: 16px;
+  line-height: 1.9;
+}
+
+.rich-content strong,
+.rich-content b {
+  color: #fff;
+  font-weight: 600;
+}
+
+.rich-content em,
+.rich-content i {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.rich-content u {
+  text-decoration: underline;
+  text-decoration-color: #00d4ff;
+}
+
+.rich-content ul,
+.rich-content ol {
+  margin: 20px 0;
+  padding-left: 30px;
+}
+
+.rich-content li {
+  margin-bottom: 8px;
+}
+
+.rich-content a {
+  color: #00d4ff;
+  text-decoration: underline;
+  transition: opacity 0.2s;
+}
+
+.rich-content a:hover {
+  opacity: 0.8;
+}
+
+.rich-content blockquote {
+  border-left: 4px solid #00d4ff;
+  padding: 12px 20px;
+  margin: 20px 0;
+  background: rgba(0, 212, 255, 0.08);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.rich-content img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin: 20px 0;
+  display: block;
+}
+
+.rich-content hr {
+  border: none;
+  border-top: 1px solid rgba(0, 212, 255, 0.2);
+  margin: 24px 0;
+}
+
+.rich-content code {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #00d4ff;
+}
+
+.rich-content pre {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  padding: 16px;
+  border-radius: 10px;
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+.rich-content pre code {
+  background: none;
+  padding: 0;
+}
+
 .comments-section {
   background: rgba(12, 12, 30, 0.22);
   backdrop-filter: blur(18px);

@@ -276,6 +276,111 @@
   background: rgba(255, 87, 87, 0.18);
 }
 
+/* 管理员标签 */
+.admin-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  color: #fff;
+  border-radius: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.admin-badge-inline {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  color: #fff;
+  border-radius: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* 移动端用户信息区 */
+.mobile-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobile-username {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mobile-avatar-change-btn {
+  padding: 8px 12px;
+  font-size: 13px;
+  background: rgba(0, 212, 255, 0.12);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: #00d4ff;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.mobile-avatar-change-btn:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+}
+
+/* 移动端头像按钮：让用户点击头像也能更换头像 */
+.mobile-avatar-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  /* 提供可见的点击反馈：轻微的边框和高光 */
+  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.4), 0 0 12px rgba(0, 212, 255, 0.3);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mobile-avatar-btn:hover,
+.mobile-avatar-btn:active {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 2px #00d4ff, 0 0 20px rgba(0, 212, 255, 0.6);
+}
+
+.mobile-avatar-btn .user-avatar {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: none;
+}
+
+/* 正在上传时的蒙层，让用户知道当前状态 */
+.mobile-avatar-uploading-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  color: #00d4ff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* 让桌面端的头像按钮样式更一致 */
+.avatar-upload-label {
+  background: transparent;
+  border: none;
+  width: 100%;
+  font-family: inherit;
+}
+
 /* 平板/小屏：768px 以下 */
 @media (max-width: 768px) {
   .navbar-container {

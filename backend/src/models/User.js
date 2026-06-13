@@ -24,6 +24,12 @@ export default (sequelize) => {
     githubId: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    // 管理员标识（默认 false）
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
     }
   }, {
     tableName: 'users',
