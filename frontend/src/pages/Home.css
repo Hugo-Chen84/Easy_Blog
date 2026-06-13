@@ -204,3 +204,161 @@
 .blog-card:hover {
   animation: glow 2s ease-in-out infinite;
 }
+
+/* 置顶帖特殊样式 */
+.blog-card-pinned {
+  border-color: rgba(255, 193, 7, 0.35);
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.08), rgba(12, 12, 30, 0.35));
+}
+
+.blog-card-pinned::before {
+  background: linear-gradient(90deg, transparent, #ffc107, transparent);
+  opacity: 1;
+}
+
+.blog-card-pinned:hover {
+  border-color: rgba(255, 193, 7, 0.6);
+  box-shadow: 0 20px 60px rgba(255, 193, 7, 0.18);
+}
+
+.pinned-badge {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #ffc107, #e67e22);
+  color: #1a1a2e;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 12px rgba(255, 193, 7, 0.35);
+}
+
+/* 首页响应式 - 768px 以下 */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 24px 14px;
+  }
+
+  .search-form {
+    gap: 8px;
+    max-width: 100%;
+  }
+
+  .search-input {
+    padding: 12px 18px;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  .search-btn {
+    padding: 12px 18px;
+    font-size: 14px;
+    border-radius: 30px;
+  }
+
+  .blog-list {
+    gap: 16px;
+  }
+
+  .blog-card {
+    padding: 20px;
+  }
+
+  .blog-card-header {
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+  }
+
+  .blog-card-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .blog-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .blog-summary {
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .blog-meta {
+    font-size: 12px;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .no-blogs {
+    font-size: 16px;
+    padding: 40px 20px;
+  }
+}
+
+/* 首页响应式 - 480px 以下 */
+@media (max-width: 480px) {
+  .home-container {
+    padding: 20px 10px;
+  }
+
+  .search-section {
+    margin-bottom: 24px;
+  }
+
+  .search-form {
+    gap: 6px;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .search-input {
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 30px;
+  }
+
+  /* 搜索按钮文字换为图标样式 */
+  .search-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+    min-width: auto;
+    border-radius: 30px;
+  }
+
+  .blog-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .blog-card-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .blog-card-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .blog-author-name {
+    font-size: 13px;
+  }
+
+  .blog-title {
+    font-size: 18px;
+  }
+
+  .blog-summary {
+    font-size: 13px;
+    line-height: 1.6;
+    -webkit-line-clamp: 4;
+  }
+
+  .blog-meta {
+    font-size: 11px;
+    gap: 10px;
+  }
+}

@@ -15,7 +15,9 @@ function Home({ user }) {
   const fetchBlogs = async () => {
     try {
       const res = await axios.get('/api/blogs')
-      setBlogs(res.data)
+      // 兼容分页结构 { items, total, page, pageSize } 与旧数组
+      const data = res.data
+      setBlogs(Array.isArray(data) ? data : data.items || [])
     } catch (err) {
       console.error('获取博客列表失败:', err)
     } finally {
@@ -30,8 +32,9 @@ function Home({ user }) {
       return
     }
     try {
-      const res = await axios.get(`/api/blogs/search?keyword=${searchQuery}`)
-      setBlogs(res.data)
+      const res = await axios.get(`/api/blogs/search?keyword=${encodeURIComponent(searchQuery)}`)
+      const data = res.data
+      setBlogs(Array.isArray(data) ? data : data.items || [])
     } catch (err) {
       console.error('搜索失败:', err)
     }
@@ -79,7 +82,11 @@ function Home({ user }) {
             <div className="no-blogs">暂无博客文章</div>
           ) : (
             blogs.map(blog => (
-              <Link to={`/blog/${blog.id}`} key={blog.id} className="blog-card">
+              <Link
+                to={`/blog/${blog.id}`}
+                key={blog.id}
+                className={`blog-card ${blog.isPinned ? 'blog-card-pinned' : ''}`}
+              >
                 <div className="blog-card-header">
                   <img
                     src={blog.author?.avatar || (blog.author?.username && getDefaultAvatar(blog.author.username))}
@@ -94,6 +101,7 @@ function Home({ user }) {
                     <span className="blog-author-name">{blog.author?.username || '匿名'}</span>
                     <span className="blog-date">{new Date(blog.createdAt).toLocaleDateString()}</span>
                   </div>
+                  {blog.isPinned && <span className="pinned-badge">📌 置顶</span>}
                 </div>
                 <h2 className="blog-title">{blog.title}</h2>
                 <p className="blog-summary">{stripMarkdown(blog.content).substring(0, 150)}...</p>

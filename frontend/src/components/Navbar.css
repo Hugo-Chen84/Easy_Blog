@@ -157,3 +157,191 @@
   color: #fff;
   box-shadow: 0 10px 30px rgba(255, 87, 87, 0.3);
 }
+
+/* GitHub 图标链接 */
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  margin-right: 8px;
+}
+
+.github-link:hover {
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.12);
+  transform: translateY(-2px) rotate(-6deg);
+  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.25);
+}
+
+/* 移动端汉堡按钮 */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 32px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  padding: 3px 2px;
+  cursor: pointer;
+  z-index: 200;
+}
+
+.hamburger-line {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.hamburger-btn:hover .hamburger-line {
+  background: #00d4ff;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+  background: #00d4ff;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.open .hamburger-line:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+  background: #00d4ff;
+}
+
+/* 移动端下拉菜单 */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  padding: 12px 20px 20px;
+  background: rgba(12, 12, 30, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(0, 212, 255, 0.2);
+  gap: 8px;
+}
+
+.mobile-menu-link {
+  display: block;
+  padding: 12px 14px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+}
+
+.mobile-menu-link:hover {
+  background: rgba(0, 212, 255, 0.15);
+  color: #00d4ff;
+}
+
+.mobile-menu-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  color: #00d4ff;
+  font-size: 15px;
+}
+
+.mobile-menu-user img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #00d4ff;
+  object-fit: cover;
+}
+
+.mobile-menu-btn {
+  margin-top: 6px;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 87, 87, 0.3);
+  color: #ff5757;
+  background: rgba(255, 87, 87, 0.08);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(255, 87, 87, 0.18);
+}
+
+/* 平板/小屏：768px 以下 */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 14px;
+    height: 60px;
+  }
+
+  .navbar-logo {
+    font-size: 22px;
+  }
+
+  .navbar-menu {
+    display: none;
+  }
+
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .mobile-menu {
+    display: flex;
+  }
+
+  .github-link {
+    margin-right: 4px;
+  }
+
+  .github-link svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* 手机小屏：480px 以下 */
+@media (max-width: 480px) {
+  .navbar-container {
+    padding: 0 10px;
+    height: 56px;
+  }
+
+  .navbar-logo {
+    font-size: 20px;
+  }
+
+  .github-link {
+    padding: 4px;
+    margin-right: 2px;
+  }
+
+  .github-link svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hamburger-btn {
+    width: 28px;
+    height: 22px;
+  }
+
+  .mobile-menu {
+    padding: 10px 14px 16px;
+  }
+
+  .mobile-menu-link,
+  .mobile-menu-btn {
+    font-size: 15px;
+    padding: 11px 12px;
+  }
+}

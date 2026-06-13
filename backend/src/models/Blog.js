@@ -22,6 +22,10 @@ export default (sequelize) => {
     viewCount: {
       type: DataTypes.INTEGER,
       defaultValue: 0
+    },
+    isPinned: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     tableName: 'blogs',

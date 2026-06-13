@@ -384,3 +384,262 @@
   color: rgba(255, 255, 255, 0.5);
   font-size: 16px;
 }
+
+/* 博客详情响应式 - 768px 以下 */
+@media (max-width: 768px) {
+  .blog-detail-container {
+    padding: 24px 14px;
+  }
+
+  .back-btn {
+    padding: 10px 18px;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .blog-content {
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+
+  .blog-detail-header {
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+  }
+
+  .blog-detail-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .blog-title {
+    font-size: 26px;
+    margin-bottom: 14px;
+  }
+
+  .blog-meta {
+    font-size: 13px;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+  }
+
+  .blog-body {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .blog-body h1 {
+    font-size: 24px;
+  }
+
+  .blog-body h2 {
+    font-size: 20px;
+  }
+
+  .blog-body h3 {
+    font-size: 17px;
+  }
+
+  .blog-body pre {
+    padding: 14px;
+    font-size: 13px;
+  }
+
+  .blog-body code {
+    font-size: 13px;
+    padding: 2px 6px;
+  }
+
+  .like-btn {
+    padding: 12px 22px;
+    font-size: 15px;
+  }
+
+  .comments-section {
+    padding: 24px;
+    border-radius: 16px;
+  }
+
+  .comments-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .comment-form textarea {
+    padding: 14px;
+    font-size: 14px;
+    min-height: 100px;
+  }
+
+  .comment-btn {
+    padding: 12px 22px;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  .comments-list {
+    gap: 16px;
+  }
+
+  .comment-item {
+    padding: 18px;
+    gap: 12px;
+    border-radius: 12px;
+  }
+
+  .comment-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .comment-header {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .comment-text {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .no-comments {
+    font-size: 14px;
+    padding: 24px;
+  }
+}
+
+/* 博客详情响应式 - 480px 以下 */
+@media (max-width: 480px) {
+  .blog-detail-container {
+    padding: 18px 10px;
+  }
+
+  .back-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    border-radius: 20px;
+  }
+
+  .blog-content {
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+
+  .blog-detail-header {
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+  }
+
+  .blog-detail-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .blog-title {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .blog-meta {
+    font-size: 12px;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+  }
+
+  .blog-body {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .blog-body h1 {
+    font-size: 20px;
+    margin: 20px 0 10px;
+  }
+
+  .blog-body h2 {
+    font-size: 18px;
+  }
+
+  .blog-body h3 {
+    font-size: 16px;
+  }
+
+  .blog-body ul,
+  .blog-body ol {
+    padding-left: 22px;
+    margin: 14px 0;
+  }
+
+  .blog-body pre {
+    padding: 12px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .blog-body blockquote {
+    padding: 10px 14px;
+    margin: 18px 0;
+  }
+
+  .blog-actions {
+    margin-top: 24px;
+    padding-top: 14px;
+  }
+
+  .like-btn {
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 24px;
+  }
+
+  .comments-section {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .comments-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .comment-form textarea {
+    padding: 12px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .comment-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+    border-radius: 20px;
+  }
+
+  .comment-item {
+    padding: 14px;
+    gap: 10px;
+    border-radius: 10px;
+  }
+
+  .comment-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .comment-text {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .no-comments {
+    font-size: 13px;
+    padding: 20px;
+  }
+}

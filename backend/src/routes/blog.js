@@ -37,40 +37,93 @@ const formatUser = (user) => {
   }
 }
 
-// 获取所有博客
+// 获取所有博客（支持分页）
 router.get('/', async (req, res) => {
   try {
-    const blogs = await Blog.findAll({
+    const page = Math.max(1, parseInt(req.query.page) || 1)
+    const pageSize = Math.max(1, parseInt(req.query.pageSize) || 20)
+    const offset = (page - 1) * pageSize
+
+    const { count, rows } = await Blog.findAndCountAll({
       include: [
         { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
+        { model: Like, as: 'likes' },
+        { model: Comment, as: 'comments' }
+      ],
+      order: [['isPinned', 'DESC'], ['createdAt', 'DESC']],
+      limit: pageSize,
+      offset
+    })
+
+    // 格式化返回数据
+    const formattedBlogs = rows.map(blog => ({
+      ...blog.toJSON(),
+      author: formatUser(blog.author)
+    }))
+
+    res.json({
+      items: formattedBlogs,
+      total: count,
+      page,
+      pageSize
+    })
+  } catch (err) {
+    res.status(500).json({ message: '获取博客列表失败', error: err.message })
+  }
+})
+
+// 搜索博客（支持按作者/标题/内容，标题优先，分页）
+router.get('/search', async (req, res) => {
+  try {
+    const { keyword } = req.query
+    const page = Math.max(1, parseInt(req.query.page) || 1)
+    const pageSize = Math.max(1, parseInt(req.query.pageSize) || 20)
+    const offset = (page - 1) * pageSize
+
+    if (!keyword) {
+      // 无关键词时退化为普通列表
+      const { count, rows } = await Blog.findAndCountAll({
+        include: [
+          { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
+          { model: Like, as: 'likes' },
+          { model: Comment, as: 'comments' }
+        ],
+        order: [['isPinned', 'DESC'], ['createdAt', 'DESC']],
+        limit: pageSize,
+        offset
+      })
+      const formattedBlogs = rows.map(blog => ({
+        ...blog.toJSON(),
+        author: formatUser(blog.author),
+        matchedIn: null
+      }))
+      return res.json({ items: formattedBlogs, total: count, page, pageSize })
+    }
+
+    const likePattern = `%${keyword}%`
+
+    // 1. 先查作者命中的博客（作者表关联匹配 username）
+    const authorMatches = await Blog.findAll({
+      include: [
+        {
+          model: User,
+          as: 'author',
+          attributes: ['id', 'username', 'avatar'],
+          where: { username: { [Op.like]: likePattern } }
+        },
         { model: Like, as: 'likes' },
         { model: Comment, as: 'comments' }
       ],
       order: [['createdAt', 'DESC']]
     })
 
-    // 格式化返回数据
-    const formattedBlogs = blogs.map(blog => ({
-      ...blog.toJSON(),
-      author: formatUser(blog.author)
-    }))
+    const authorMatchIds = new Set(authorMatches.map(b => b.id))
 
-    res.json(formattedBlogs)
-  } catch (err) {
-    res.status(500).json({ message: '获取博客列表失败', error: err.message })
-  }
-})
-
-// 搜索博客
-router.get('/search', async (req, res) => {
-  try {
-    const { keyword } = req.query
-    const blogs = await Blog.findAll({
+    // 2. 查标题命中（排除已在作者命中的）
+    const titleMatches = await Blog.findAll({
       where: {
-        [Op.or]: [
-          { title: { [Op.like]: `%${keyword}%` } },
-          { content: { [Op.like]: `%${keyword}%` } }
-        ]
+        title: { [Op.like]: likePattern },
+        id: { [Op.notIn]: [...authorMatchIds] }
       },
       include: [
         { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
@@ -80,12 +133,47 @@ router.get('/search', async (req, res) => {
       order: [['createdAt', 'DESC']]
     })
 
-    const formattedBlogs = blogs.map(blog => ({
-      ...blog.toJSON(),
-      author: formatUser(blog.author)
-    }))
+    const titleMatchIds = new Set(titleMatches.map(b => b.id))
+    const excludedIds = [...authorMatchIds, ...titleMatchIds]
 
-    res.json(formattedBlogs)
+    // 3. 查内容命中（排除已命中的）
+    const contentMatches = await Blog.findAll({
+      where: {
+        content: { [Op.like]: likePattern },
+        id: { [Op.notIn]: excludedIds }
+      },
+      include: [
+        { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
+        { model: Like, as: 'likes' },
+        { model: Comment, as: 'comments' }
+      ],
+      order: [['createdAt', 'DESC']]
+    })
+
+    // 合并并标记 matchedIn，顺序为 author -> title -> content
+    const withMatchedIn = (items, matchedIn) =>
+      items.map(blog => ({
+        ...blog.toJSON(),
+        author: formatUser(blog.toJSON().author),
+        matchedIn
+      }))
+
+    const merged = [
+      ...withMatchedIn(authorMatches, 'author'),
+      ...withMatchedIn(titleMatches, 'title'),
+      ...withMatchedIn(contentMatches, 'content')
+    ]
+
+    // 置顶帖始终排在最前面，然后保留原 matchedIn 优先级
+    merged.sort((a, b) => {
+      if ((a.isPinned ? 1 : 0) !== (b.isPinned ? 1 : 0)) return b.isPinned ? 1 : -1
+      return 0
+    })
+
+    const total = merged.length
+    const items = merged.slice(offset, offset + pageSize)
+
+    res.json({ items, total, page, pageSize })
   } catch (err) {
     res.status(500).json({ message: '搜索失败', error: err.message })
   }
