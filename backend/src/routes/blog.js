@@ -37,7 +37,14 @@ const authWithUser = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: '用户不存在' })
     }
-    req.user = user.toJSON()
+    const userData = user.toJSON()
+    // 规范化 isAdmin：统一转为 boolean，避免 SQLite 字符串/整数混合
+    userData.isAdmin =
+      userData.isAdmin === true ||
+      userData.isAdmin === 1 ||
+      userData.isAdmin === 'true' ||
+      userData.isAdmin === '1'
+    req.user = userData
     next()
   } catch (err) {
     res.status(401).json({ message: 'token 无效' })
@@ -313,7 +320,11 @@ router.delete('/:id', authWithUser, async (req, res) => {
   try {
     const blogId = req.params.id
     const userId = req.user.id
-    const isAdmin = !!req.user.isAdmin
+    const isAdmin =
+      req.user.isAdmin === true ||
+      req.user.isAdmin === 1 ||
+      req.user.isAdmin === 'true' ||
+      req.user.isAdmin === '1'
 
     const blog = await Blog.findByPk(blogId)
     if (!blog) {

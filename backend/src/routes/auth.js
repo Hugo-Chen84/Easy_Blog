@@ -146,10 +146,12 @@ router.post('/github-login', async (req, res) => {
       }
     }
 
-    // 生成 token（与普通登录结构一致）
-    const jwtToken = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
-      expiresIn: '7d'
-    })
+    // 生成 token（包含 isAdmin，便于后续各接口做权限判断）
+    const jwtToken = jwt.sign(
+      { id: user.id, username: user.username, isAdmin: !!user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    )
 
     res.json({
       token: jwtToken,
@@ -243,10 +245,12 @@ router.post('/login', async (req, res) => {
       await user.update({ avatar })
     }
 
-    // 生成 token
-    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
-      expiresIn: '7d'
-    })
+    // 生成 token（包含 isAdmin，便于后续各接口做权限判断）
+    const token = jwt.sign(
+      { id: user.id, username: user.username, isAdmin: !!user.isAdmin },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    )
 
     res.json({
       token,
