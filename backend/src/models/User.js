@@ -23,8 +23,7 @@ export default (sequelize) => {
     // GitHub Device Flow 登录所用字段（未配置时可为空，首次 GitHub 登录时写入）
     githubId: {
       type: DataTypes.STRING,
-      allowNull: true,
-      unique: true
+      allowNull: true
     }
   }, {
     tableName: 'users',
