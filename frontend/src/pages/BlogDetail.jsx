@@ -6,12 +6,19 @@ import remarkGfm from 'remark-gfm'
 import './BlogDetail.css'
 
 // 判断内容是否为 HTML（富文本模式产生的）
+// 更严格的判定：只有当内容以 HTML 标签开头，或以 HTML 为主要结构时才判定为 HTML
 function isHtmlContent(content) {
   if (!content) return false
   const trimmed = content.trim()
-  // 简单检测：包含常见 HTML 标签
-  const htmlTags = /<(div|p|span|h[1-6]|strong|em|b|i|u|br|ul|ol|li|a|img|pre|code|blockquote|table|tr|td|th)[^>]*>/i
-  return htmlTags.test(trimmed)
+  if (!trimmed) return false
+  // 1. 以 HTML 标签开头 → 很可能是富文本
+  const startsWithHtml = /^<(div|p|span|h[1-6]|strong|em|b|i|u|ul|ol|li|a|img|pre|code|blockquote|table|hr|br)[^>]*>/i
+  if (startsWithHtml.test(trimmed)) return true
+  // 2. 统计 HTML 标签数量与非空行数的比例
+  const tagMatches = trimmed.match(/<\/?(div|p|h[1-6]|strong|em|b|i|u|br|ul|ol|li|a|img|blockquote|pre|code|span|table)[^>]*>/gi) || []
+  const lineCount = trimmed.split(/\n/).filter(l => l.trim().length > 0).length || 1
+  if (tagMatches.length > lineCount * 0.5) return true
+  return false
 }
 
 function BlogDetail({ user }) {
@@ -166,8 +173,10 @@ function BlogDetail({ user }) {
               // 富文本模式：直接渲染 HTML
               <div className="rich-content" dangerouslySetInnerHTML={{ __html: blog.content }} />
             ) : (
-              // Markdown 模式
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{blog.content}</ReactMarkdown>
+              // Markdown 模式：统一用 markdown-content 包装，便于 CSS 精确命中
+              <div className="markdown-content">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{blog.content}</ReactMarkdown>
+              </div>
             )}
           </div>
 

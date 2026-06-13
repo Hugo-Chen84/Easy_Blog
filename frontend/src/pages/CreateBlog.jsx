@@ -204,6 +204,42 @@ function CreateBlog({ user }) {
     }
   }
 
+  // Markdown 模式下插入链接：[选中文字](用户输入的URL)
+  const insertMarkdownLink = () => {
+    const textarea = markdownTextareaRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selectedText = markdownContent.substring(start, end) || '链接文字'
+    const url = prompt('请输入链接地址：', 'https://')
+    if (!url) return
+    const newContent = markdownContent.substring(0, start) + `[${selectedText}](${url})` + markdownContent.substring(end)
+    setMarkdownContent(newContent)
+    setTimeout(() => {
+      textarea.focus()
+      const pos = start + `[${selectedText}](${url})`.length
+      textarea.setSelectionRange(pos, pos)
+    }, 10)
+  }
+
+  // Markdown 模式下插入图片：![图片描述](用户输入URL)
+  const insertMarkdownImageByUrl = () => {
+    const textarea = markdownTextareaRef.current
+    if (!textarea) return
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selectedText = markdownContent.substring(start, end) || '图片描述'
+    const url = prompt('请输入图片地址：', 'https://')
+    if (!url) return
+    const newContent = markdownContent.substring(0, start) + `\n![${selectedText}](${url})\n` + markdownContent.substring(end)
+    setMarkdownContent(newContent)
+    setTimeout(() => {
+      textarea.focus()
+      const pos = start + `\n![${selectedText}](${url})\n`.length
+      textarea.setSelectionRange(pos, pos)
+    }, 10)
+  }
+
   // 富文本编辑器内容变化
   const onRichInput = () => {
     if (richEditorRef.current) {
@@ -282,7 +318,7 @@ function CreateBlog({ user }) {
                   <button type="button" onClick={() => execRich('italic')} className="tool-btn" title="斜体"><i>I</i></button>
                   <button type="button" onClick={() => execRich('underline')} className="tool-btn" title="下划线"><u>U</u></button>
                   <span className="tool-divider"></span>
-                  <button type="button" onClick={() => execRich('formatBlock', 'H2')} className="tool-btn" title="标题">H</button>
+                  <button type="button" onClick={() => execRich('formatBlock', '<h2>')} className="tool-btn" title="标题">H</button>
                   <button type="button" onClick={() => execRich('insertUnorderedList')} className="tool-btn" title="无序列表">•</button>
                   <button type="button" onClick={() => execRich('insertOrderedList')} className="tool-btn" title="有序列表">1.</button>
                   <span className="tool-divider"></span>
@@ -304,11 +340,11 @@ function CreateBlog({ user }) {
                   <span className="tool-divider"></span>
                   <button type="button" onClick={() => insertMarkdown('## ', false, '二级标题')} className="tool-btn" title="标题">H</button>
                   <button type="button" onClick={insertMarkdownListItem} className="tool-btn" title="列表">•</button>
-                  <button type="button" onClick={() => insertMarkdown('`', true, 'code')} className="tool-btn" title="行内代码">{`</>`}</button>
-                  <button type="button" onClick={insertMarkdownCodeBlock} className="tool-btn" title="代码块">{`{ }`}</button>
+                  <button type="button" onClick={() => insertMarkdown('`', true, 'code')} className="tool-btn" title="行内代码">{'<>'}</button>
+                  <button type="button" onClick={insertMarkdownCodeBlock} className="tool-btn" title="代码块">{ '{ }' }</button>
                   <span className="tool-divider"></span>
-                  <button type="button" onClick={() => insertMarkdown('[链接](https://)', false, '')} className="tool-btn" title="链接">🔗</button>
-                  <button type="button" onClick={handleImageUpload} className="tool-btn tool-btn-image" title="插入图片">
+                  <button type="button" onClick={insertMarkdownLink} className="tool-btn" title="链接">🔗</button>
+                  <button type="button" onClick={handleImageUpload} className="tool-btn tool-btn-image" title="上传图片">
                     🖼️ {uploadingImage ? '上传中...' : '图片'}
                   </button>
                   <button type="button" onClick={() => insertMarkdown('> ', false, '引用文字')} className="tool-btn" title="引用">❝</button>
@@ -356,7 +392,9 @@ function CreateBlog({ user }) {
                   editorMode === 'rich' ? (
                     <div className="rich-preview" dangerouslySetInnerHTML={{ __html: previewContent }} />
                   ) : (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent}</ReactMarkdown>
+                    <div className="markdown-preview">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{previewContent}</ReactMarkdown>
+                    </div>
                   )
                 ) : (
                   <div className="empty-preview">在编辑区输入内容，预览将在这里显示</div>
