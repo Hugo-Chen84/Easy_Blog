@@ -1,19 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import './Login.css'
 
 // GitHub Device Flow 登录：向 GitHub 请求 device code，
 // 展示 user_code + 链接让用户去 github.com/login/device 授权，
 // 然后轮询直到拿到 access_token，最后 POST 到后端完成登录。
-async function handleGitHubLogin(setError, setGitHubInfo, setPolling) {
+async function handleGitHubLogin(setError, setGitHubInfo, setPolling, isMountedRef) {
+  const safeSetError = (msg) => {
+    if (isMountedRef && isMountedRef.current) setError(msg)
+  }
+  const safeSetGitHubInfo = (info) => {
+    if (isMountedRef && isMountedRef.current) setGitHubInfo(info)
+  }
+  const safeSetPolling = (val) => {
+    if (isMountedRef && isMountedRef.current) setPolling(val)
+  }
+
   try {
-    setError('')
+    safeSetError('')
 
     // 1. 检查后端是否启用 GitHub 登录
     const cfgRes = await axios.get('/api/auth/github-config')
     const { enabled, clientId } = cfgRes.data || {}
     if (!enabled || !clientId) {
-      setError('管理员未配置 GitHub 登录')
+      safeSetError('管理员未配置 GitHub 登录')
       return
     }
 
@@ -37,12 +47,12 @@ async function handleGitHubLogin(setError, setGitHubInfo, setPolling) {
     } = deviceRes.data || {}
 
     if (!userCode || !deviceCode) {
-      setError('无法从 GitHub 获取授权码，请稍后再试')
+      safeSetError('无法从 GitHub 获取授权码，请稍后再试')
       return
     }
 
     // 展示 user_code + 链接
-    setGitHubInfo({
+    safeSetGitHubInfo({
       userCode,
       deviceCode,
       verificationUri: verificationUri || 'https://github.com/login/device',
@@ -50,7 +60,7 @@ async function handleGitHubLogin(setError, setGitHubInfo, setPolling) {
       interval: (interval || 5) * 1000,
       expiresAt: Date.now() + (expiresIn || 900) * 1000
     })
-    setPolling(true)
+    safeSetPolling(true)
 
     // 3. 轮询 GitHub 直到获取 access_token
     let accessToken = null
@@ -60,7 +70,15 @@ async function handleGitHubLogin(setError, setGitHubInfo, setPolling) {
     const pollInterval = (interval || 5) * 1000
 
     while (!accessToken && Date.now() - startTime < (expiresIn || 900) * 1000) {
+      // 如果组件已卸载，停止轮询，避免 React 警告
+      if (isMountedRef && !isMountedRef.current) {
+        return
+      }
       await new Promise((r) => setTimeout(r, pollInterval))
+      // 再次检查组件是否已卸载
+      if (isMountedRef && !isMountedRef.current) {
+        return
+      }
       try {
         const pollRes = await axios.post(
           'https://github.com/login/oauth/access_token',
@@ -97,10 +115,15 @@ async function handleGitHubLogin(setError, setGitHubInfo, setPolling) {
       }
     }
 
+    // 组件卸载则不再处理后续流程
+    if (isMountedRef && !isMountedRef.current) {
+      return
+    }
+
     if (!accessToken) {
-      setGitHubInfo(null)
-      setPolling(false)
-      setError(lastError || '未在有效时间内完成授权，请重试')
+      safeSetGitHubInfo(null)
+      safeSetPolling(false)
+      safeSetError(lastError || '未在有效时间内完成授权，请重试')
       return
     }
 
@@ -116,21 +139,21 @@ async function handleGitHubLogin(setError, setGitHubInfo, setPolling) {
     localStorage.setItem('token', loginRes.data.token)
     localStorage.setItem('user', JSON.stringify(loginRes.data.user))
 
-    setGitHubInfo(null)
-    setPolling(false)
+    safeSetGitHubInfo(null)
+    safeSetPolling(false)
 
     // 通知父组件 / 或直接刷新
     if (typeof window !== 'undefined') {
       window.location.href = '/'
     }
   } catch (err) {
-    setGitHubInfo(null)
-    setPolling(false)
+    safeSetGitHubInfo(null)
+    safeSetPolling(false)
     const msg =
       err.response?.data?.message ||
       err.message ||
       'GitHub 登录失败，请稍后再试'
-    setError(msg)
+    safeSetError(msg)
   }
 }
 
@@ -142,6 +165,14 @@ function Login({ setUser }) {
   const [error, setError] = useState('')
   const [githubInfo, setGitHubInfo] = useState(null)
   const [githubPolling, setGitHubPolling] = useState(false)
+  const isMountedRef = useRef(true)
+
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
   // 如果父组件通过 props 传递 setUser，登录完成后也更新它
   useEffect(() => {
@@ -172,7 +203,7 @@ function Login({ setUser }) {
 
   const onGitHubClick = () => {
     if (githubPolling) return
-    handleGitHubLogin(setError, setGitHubInfo, setGitHubPolling)
+    handleGitHubLogin(setError, setGitHubInfo, setGitHubPolling, isMountedRef)
   }
 
   return (

@@ -324,7 +324,7 @@ function CreateBlog({ user }) {
                     contentEditable
                     suppressContentEditableWarning
                     onInput={onRichInput}
-                    placeholder="在这里开始写作...\n\n支持：加粗、斜体、标题、列表、链接、插入图片..."
+                    data-placeholder="在这里开始写作...&#10;&#10;支持：加粗、斜体、标题、列表、链接、插入图片..."
                     className="rich-editor"
                   />
                 </div>

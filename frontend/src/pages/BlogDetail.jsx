@@ -116,10 +116,12 @@ function BlogDetail({ user }) {
   // 判断当前用户是否有权限删除
   const canDelete = () => {
     if (!user || !blog) return false
-    // 作者本人可删自己的
-    if (blog.author?.id === user.id) return true
-    // 管理员可删所有
-    if (user.isAdmin === true || user.isAdmin === 'true' || user.isAdmin === 1 || user.isAdmin === '1') return true
+    // 作者本人（宽松比较，防止 id 类型不一致）
+    if (String(blog.author?.id) === String(user.id)) return true
+    // 管理员可删除所有博客（真值判断）
+    if (user.isAdmin === true || user.isAdmin === 'true' ||
+        user.isAdmin === 1 || user.isAdmin === '1' ||
+        !!user.isAdmin) return true
     return false
   }
 

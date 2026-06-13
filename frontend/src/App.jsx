@@ -30,7 +30,7 @@ function App() {
         })
         .then((res) => {
           const freshUser = {
-            id: res.data.id,
+            id: String(res.data.id),
             username: res.data.username,
             avatar: res.data.avatar,
             isAdmin: !!res.data.isAdmin

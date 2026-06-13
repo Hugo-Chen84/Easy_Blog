@@ -137,7 +137,8 @@ router.post('/github-login', async (req, res) => {
         // GitHub 登录的用户不需要密码，但模型要求 not null；使用随机强哈希占位
         password: await bcrypt.hash(`gh_${githubId}_${JWT_SECRET}`, 10),
         avatar,
-        githubId
+        githubId,
+        isAdmin: false
       })
     } else {
       // 已有用户：如头像为空，同步更新为 GitHub 头像
@@ -204,7 +205,8 @@ router.post('/register', async (req, res) => {
     const user = await User.create({
       username,
       password: hashedPassword,
-      avatar: defaultAvatar
+      avatar: defaultAvatar,
+      isAdmin: false
     })
 
     res.status(201).json({
@@ -273,7 +275,12 @@ router.get('/me', async (req, res) => {
     if (!token) {
       return res.status(401).json({ message: '请先登录' })
     }
-    const decoded = jwt.verify(token, JWT_SECRET)
+    let decoded
+    try {
+      decoded = jwt.verify(token, JWT_SECRET)
+    } catch (e) {
+      return res.status(401).json({ message: 'token 无效或已过期' })
+    }
     const user = await User.findByPk(decoded.id)
     if (!user) {
       return res.status(404).json({ message: '用户不存在' })
@@ -292,7 +299,7 @@ router.get('/me', async (req, res) => {
       isAdmin: !!user.isAdmin
     })
   } catch (err) {
-    res.status(401).json({ message: 'token 无效' })
+    res.status(401).json({ message: 'token 无效或已过期' })
   }
 })
 
@@ -303,7 +310,12 @@ router.post('/upload-avatar', async (req, res) => {
     if (!token) {
       return res.status(401).json({ message: '请先登录' })
     }
-    const decoded = jwt.verify(token, JWT_SECRET)
+    let decoded
+    try {
+      decoded = jwt.verify(token, JWT_SECRET)
+    } catch (e) {
+      return res.status(401).json({ message: 'token 无效或已过期' })
+    }
     const user = await User.findByPk(decoded.id)
     if (!user) {
       return res.status(404).json({ message: '用户不存在' })
