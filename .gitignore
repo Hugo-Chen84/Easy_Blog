@@ -6,3 +6,4 @@ dist/
 backend/database.sqlite
 *.sqlite
 .vite/
+backend/uploads/
