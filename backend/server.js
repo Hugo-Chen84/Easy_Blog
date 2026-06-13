@@ -69,6 +69,37 @@ app.get('*', (req, res, next) => {
   res.sendFile(path.join(distPath, 'index.html'))
 })
 
+// 安全地确保数据库列存在（兼容 SQLite，重复执行安全）
+const ensureColumns = async () => {
+  try {
+    const queryInterface = sequelize.getQueryInterface
+
+    // User 表：添加 githubId 列（仅在不存在时添加）
+    try {
+      const userColumns = await queryInterface.describeTable('users')
+      if (!('githubId' in userColumns)) {
+        await sequelize.query("ALTER TABLE users ADD COLUMN githubId TEXT")
+        console.log('✅ 已为 users 表添加 githubId 列')
+      }
+    } catch (e) {
+      console.warn('⚠️  users.githubId 列检查/添加跳过:', e.message)
+    }
+
+    // Blog 表：添加 isPinned 列（仅在不存在时添加）
+    try {
+      const blogColumns = await queryInterface.describeTable('blogs')
+      if (!('isPinned' in blogColumns)) {
+        await sequelize.query("ALTER TABLE blogs ADD COLUMN isPinned INTEGER DEFAULT 0")
+        console.log('✅ 已为 blogs 表添加 isPinned 列')
+      }
+    } catch (e) {
+      console.warn('⚠️  blogs.isPinned 列检查/添加跳过:', e.message)
+    }
+  } catch (err) {
+    console.warn('⚠️  ensureColumns 警告:', err.message)
+  }
+}
+
 // 种子数据：创建管理员和欢迎置顶帖
 const seedWelcomePost = async () => {
   try {
@@ -117,18 +148,21 @@ const seedWelcomePost = async () => {
   }
 }
 
-// 数据库同步 + 启动服务器
-// alter:true 让 Sequelize 自动为新字段补齐列（不会删除现有数据）；仅首次启动建表
+// 数据库同步 + 启动
+// 先 sync({ alter: true }) 尝试标准建表/升级（生产中通常只需一次），
+// 再用 ALTER TABLE 安全补齐遗漏的列（幂等，可重复执行），
+// 最后启动服务器（即使有警告也不阻塞启动）。
 sequelize.sync({ alter: true }).then(async () => {
-  console.log('数据库同步成功')
-  await seedWelcomePost()
+  console.log('✅ 数据库结构同步完成')
+  await ensureColumns()      // 幂等补列
+  await seedWelcomePost()    // 种子数据
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`服务器运行在 http://localhost:${PORT}`)
+    console.log(`🚀 服务器运行在 http://localhost:${PORT}`)
   })
 }).catch(err => {
-  console.error('数据库同步失败:', err.message)
-  // 即使同步警告也尝试启动
+  console.error('❌ 数据库初始化失败:', err.message)
+  // 启动服务器（有时只是警告，API 仍可用）
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`服务器运行在 http://localhost:${PORT}（数据库警告已忽略）`)
+    console.log(`⚠️  服务器以受限模式运行在 http://localhost:${PORT}`)
   })
 })
