@@ -157,58 +157,6 @@ pm2 restart easy-blog
 
 ---
 
-## 🚀 部署到 Render.com (海外平台，完全免费)
-
-### 步骤 1: 准备工作
-
-1. 确保代码已推送到 GitHub 仓库: https://github.com/Hugo-Chen84/Easy_Blog
-2. 注册一个 Render 账号: https://render.com （用 GitHub 登录）
-
-### 步骤 2: 在 Render 创建 Web Service
-
-1. 登录 Render 后，点击 **"New +"** → **"Web Service"**
-2. 选择你刚才推送的 GitHub 仓库 **Easy_Blog**
-3. 按下面填写配置:
-
-| 配置项 | 填写内容 |
-|--------|---------|
-| **Name** | `easy-blog` 或你喜欢的名字 |
-| **Region** | 选一个离你近的，例如 `Singapore` |
-| **Branch** | `master` |
-| **Runtime** | `Node` |
-| **Build Command** | `npm install` |
-| **Start Command** | `npm start` |
-| **Plan** | `Free` （免费） |
-
-⚠️ **重要提示：Render Free 版不支持持久化硬盘**
-- 你的 SQLite 数据会在每次服务器重启后丢失
-- 适合测试体验，不适合长期使用
-- 长期使用请选择 Starter ($7/月) 或阿里云 ECS
-
-4. 点击 **"Deploy"** 按钮，等待部署完成（大约 2-5 分钟）
-
-5. 部署成功后，你会得到一个网址，例如: `https://easy-blog-xxx.onrender.com`
-
-打开这个网址就能访问你的博客了！🎉
-
-### 步骤 3: 以后修改代码如何同步？
-
-**非常简单！每次修改后只需 3 步:**
-
-```bash
-# 1. 保存修改后的代码
-# 2. 提交到 git
-git add .
-git commit -m "更新了首页样式"
-
-# 3. 推送到 GitHub
-git push
-```
-
-**Render 会自动检测到 GitHub 的更新，重新编译部署！** （1-2 分钟后你的网站就更新了）
-
----
-
 ## 📁 项目结构
 
 ```
@@ -225,7 +173,6 @@ Easy_Blog/
 │   └── server.js        # 服务器入口
 ├── pictures/            # 背景图片
 ├── package.json         # 根目录部署脚本
-├── render.yaml          # Render 部署配置
 ├── Dockerfile           # 容器镜像配置 (阿里云容器服务)
 ├── nginx.conf           # Nginx 反向代理配置
 ├── deploy.sh            # 阿里云 ECS 一键部署脚本
