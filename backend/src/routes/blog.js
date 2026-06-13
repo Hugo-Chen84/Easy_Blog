@@ -22,18 +22,40 @@ const authMiddleware = (req, res, next) => {
   }
 }
 
+// 获取用户默认头像（用于老用户）
+const getDefaultAvatar = (username) => {
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`
+}
+
+// 格式化用户信息（确保有头像）
+const formatUser = (user) => {
+  if (!user) return null
+  return {
+    id: user.id,
+    username: user.username,
+    avatar: user.avatar || getDefaultAvatar(user.username)
+  }
+}
+
 // 获取所有博客
 router.get('/', async (req, res) => {
   try {
     const blogs = await Blog.findAll({
       include: [
-        { model: User, as: 'author', attributes: ['id', 'username'] },
+        { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
         { model: Like, as: 'likes' },
         { model: Comment, as: 'comments' }
       ],
       order: [['createdAt', 'DESC']]
     })
-    res.json(blogs)
+
+    // 格式化返回数据
+    const formattedBlogs = blogs.map(blog => ({
+      ...blog.toJSON(),
+      author: formatUser(blog.author)
+    }))
+
+    res.json(formattedBlogs)
   } catch (err) {
     res.status(500).json({ message: '获取博客列表失败', error: err.message })
   }
@@ -51,13 +73,19 @@ router.get('/search', async (req, res) => {
         ]
       },
       include: [
-        { model: User, as: 'author', attributes: ['id', 'username'] },
+        { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
         { model: Like, as: 'likes' },
         { model: Comment, as: 'comments' }
       ],
       order: [['createdAt', 'DESC']]
     })
-    res.json(blogs)
+
+    const formattedBlogs = blogs.map(blog => ({
+      ...blog.toJSON(),
+      author: formatUser(blog.author)
+    }))
+
+    res.json(formattedBlogs)
   } catch (err) {
     res.status(500).json({ message: '搜索失败', error: err.message })
   }
@@ -68,11 +96,11 @@ router.get('/:id', async (req, res) => {
   try {
     const blog = await Blog.findByPk(req.params.id, {
       include: [
-        { model: User, as: 'author', attributes: ['id', 'username'] },
-        { 
-          model: Comment, 
+        { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
+        {
+          model: Comment,
           as: 'comments',
-          include: [{ model: User, as: 'user', attributes: ['id', 'username'] }],
+          include: [{ model: User, as: 'user', attributes: ['id', 'username', 'avatar'] }],
           order: [['createdAt', 'DESC']]
         },
         { model: Like, as: 'likes' }
@@ -81,7 +109,22 @@ router.get('/:id', async (req, res) => {
     if (!blog) {
       return res.status(404).json({ message: '博客不存在' })
     }
-    res.json(blog)
+
+    // 增加浏览次数
+    await blog.increment('viewCount', { by: 1 })
+    await blog.reload()
+
+    // 格式化返回
+    const blogData = blog.toJSON()
+    blogData.author = formatUser(blogData.author)
+    if (blogData.comments) {
+      blogData.comments = blogData.comments.map(c => ({
+        ...c,
+        user: formatUser(c.user)
+      }))
+    }
+
+    res.json(blogData)
   } catch (err) {
     res.status(500).json({ message: '获取博客详情失败', error: err.message })
   }
@@ -94,7 +137,8 @@ router.post('/', authMiddleware, async (req, res) => {
     const blog = await Blog.create({
       title,
       content,
-      authorId: req.user.id
+      authorId: req.user.id,
+      viewCount: 0
     })
     res.status(201).json(blog)
   } catch (err) {

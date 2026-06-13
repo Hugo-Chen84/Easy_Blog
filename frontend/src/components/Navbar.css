@@ -60,7 +60,69 @@
   width: 100%;
 }
 
-.navbar-user {
+.navbar-user-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #00d4ff;
+  object-fit: cover;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1);
+}
+
+.avatar-menu {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background: rgba(12, 12, 30, 0.95);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  min-width: 150px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 200;
+}
+
+.avatar-upload-label {
+  display: block;
+  padding: 10px;
+  color: #00d4ff;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.avatar-upload-label:hover {
+  background: rgba(0, 212, 255, 0.15);
+}
+
+.avatar-username {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.navbar-username {
   color: #00d4ff;
   font-size: 14px;
   font-weight: 500;

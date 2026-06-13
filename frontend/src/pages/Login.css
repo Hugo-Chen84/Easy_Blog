@@ -130,3 +130,24 @@
   text-align: center;
   margin-bottom: 25px;
 }
+
+.form-hint {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-hint.error-hint {
+  color: #ff5757;
+}
+
+.form-hint.success-hint {
+  color: #57ff96;
+}
+
+.input-error {
+  border-color: rgba(255, 87, 87, 0.5) !important;
+}
+
+.input-success {
+  border-color: rgba(87, 255, 150, 0.5) !important;
+}

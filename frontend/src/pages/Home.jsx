@@ -37,6 +37,23 @@ function Home({ user }) {
     }
   }
 
+  const getDefaultAvatar = (username) => {
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`
+  }
+
+  // 移除 Markdown 格式用于摘要
+  const stripMarkdown = (text) => {
+    if (!text) return ''
+    return text
+      .replace(/###?\s/g, '')
+      .replace(/\*\*?/g, '')
+      .replace(/~~/g, '')
+      .replace(/`[^`]*`/g, '')
+      .replace(/\[[^\]]*\]\([^)]*\)/g, '')
+      .replace(/#/g, '')
+      .replace(/[-*]/g, '')
+  }
+
   if (loading) {
     return <div className="loading">加载中...</div>
   }
@@ -63,13 +80,23 @@ function Home({ user }) {
           ) : (
             blogs.map(blog => (
               <Link to={`/blog/${blog.id}`} key={blog.id} className="blog-card">
+                <div className="blog-card-header">
+                  <img
+                    src={blog.author?.avatar || (blog.author?.username && getDefaultAvatar(blog.author.username))}
+                    alt={blog.author?.username || '匿名'}
+                    className="blog-card-avatar"
+                  />
+                  <div className="blog-card-author-info">
+                    <span className="blog-author-name">{blog.author?.username || '匿名'}</span>
+                    <span className="blog-date">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
                 <h2 className="blog-title">{blog.title}</h2>
-                <p className="blog-summary">{blog.content.substring(0, 150)}...</p>
+                <p className="blog-summary">{stripMarkdown(blog.content).substring(0, 150)}...</p>
                 <div className="blog-meta">
-                  <span className="blog-author">作者: {blog.author?.username || '匿名'}</span>
-                  <span className="blog-date">{new Date(blog.createdAt).toLocaleDateString()}</span>
                   <span className="blog-likes">❤️ {blog.likes?.length || 0}</span>
                   <span className="blog-comments">💬 {blog.comments?.length || 0}</span>
+                  <span className="blog-views">👁️ {blog.viewCount || 0}</span>
                 </div>
               </Link>
             ))

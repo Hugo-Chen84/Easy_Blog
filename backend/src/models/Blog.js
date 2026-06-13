@@ -18,6 +18,10 @@ export default (sequelize) => {
     authorId: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    viewCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
   }, {
     tableName: 'blogs',

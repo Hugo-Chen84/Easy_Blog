@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import './BlogDetail.css'
 
 function BlogDetail({ user }) {
@@ -62,7 +64,7 @@ function BlogDetail({ user }) {
 
     try {
       const token = localStorage.getItem('token')
-      await axios.post(`/api/blogs/${id}/comments`, 
+      await axios.post(`/api/blogs/${id}/comments`,
         { content: comment },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -71,6 +73,10 @@ function BlogDetail({ user }) {
     } catch (err) {
       console.error('评论失败:', err)
     }
+  }
+
+  const getDefaultAvatar = (username) => {
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`
   }
 
   if (loading) {
@@ -85,18 +91,33 @@ function BlogDetail({ user }) {
     <div className="blog-detail">
       <div className="blog-detail-container">
         <button onClick={() => navigate(-1)} className="back-btn">← 返回</button>
-        
+
         <article className="blog-content">
-          <h1 className="blog-title">{blog.title}</h1>
-          <div className="blog-meta">
-            <span>作者: {blog.author?.username || '匿名'}</span>
-            <span>{new Date(blog.createdAt).toLocaleString()}</span>
+          <div className="blog-detail-header">
+            <img
+              src={blog.author?.avatar || (blog.author?.username && getDefaultAvatar(blog.author.username))}
+              alt={blog.author?.username || '匿名'}
+              className="blog-detail-avatar"
+            />
+            <div className="blog-detail-header-info">
+              <h1 className="blog-title">{blog.title}</h1>
+              <div className="blog-meta">
+                <span className="blog-author">作者: {blog.author?.username || '匿名'}</span>
+                <span className="blog-date">{new Date(blog.createdAt).toLocaleString()}</span>
+                <span className="blog-view-count">👁️ 浏览 {blog.viewCount || 0}</span>
+              </div>
+            </div>
           </div>
-          <div className="blog-body">{blog.content}</div>
-          
+
+          <div className="blog-body">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {blog.content}
+            </ReactMarkdown>
+          </div>
+
           <div className="blog-actions">
-            <button 
-              onClick={handleLike} 
+            <button
+              onClick={handleLike}
               className={`like-btn ${isLiked ? 'liked' : ''}`}
             >
               {isLiked ? '❤️ 已点赞' : '🤍 点赞'} ({blog.likes?.length || 0})
@@ -106,7 +127,7 @@ function BlogDetail({ user }) {
 
         <section className="comments-section">
           <h2 className="comments-title">评论 ({blog.comments?.length || 0})</h2>
-          
+
           {user && (
             <form onSubmit={handleComment} className="comment-form">
               <textarea
@@ -120,13 +141,23 @@ function BlogDetail({ user }) {
           )}
 
           <div className="comments-list">
+            {blog.comments?.length === 0 && (
+              <div className="no-comments">暂无评论，快来抢沙发！</div>
+            )}
             {blog.comments?.map(c => (
               <div key={c.id} className="comment-item">
-                <div className="comment-header">
-                  <span className="comment-author">{c.user?.username || '匿名'}</span>
-                  <span className="comment-time">{new Date(c.createdAt).toLocaleString()}</span>
+                <img
+                  src={c.user?.avatar || (c.user?.username && getDefaultAvatar(c.user.username))}
+                  alt={c.user?.username || '匿名'}
+                  className="comment-avatar"
+                />
+                <div className="comment-content-wrapper">
+                  <div className="comment-header">
+                    <span className="comment-author">{c.user?.username || '匿名'}</span>
+                    <span className="comment-time">{new Date(c.createdAt).toLocaleString()}</span>
+                  </div>
+                  <p className="comment-text">{c.content}</p>
                 </div>
-                <p className="comment-content">{c.content}</p>
               </div>
             ))}
           </div>
