@@ -85,6 +85,10 @@ function Home({ user }) {
                     src={blog.author?.avatar || (blog.author?.username && getDefaultAvatar(blog.author.username))}
                     alt={blog.author?.username || '匿名'}
                     className="blog-card-avatar"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null
+                      e.currentTarget.src = getDefaultAvatar(blog.author?.username || 'user')
+                    }}
                   />
                   <div className="blog-card-author-info">
                     <span className="blog-author-name">{blog.author?.username || '匿名'}</span>

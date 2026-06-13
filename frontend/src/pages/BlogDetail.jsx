@@ -98,6 +98,10 @@ function BlogDetail({ user }) {
               src={blog.author?.avatar || (blog.author?.username && getDefaultAvatar(blog.author.username))}
               alt={blog.author?.username || '匿名'}
               className="blog-detail-avatar"
+              onError={(e) => {
+                e.currentTarget.onerror = null
+                e.currentTarget.src = getDefaultAvatar(blog.author?.username || 'user')
+              }}
             />
             <div className="blog-detail-header-info">
               <h1 className="blog-title">{blog.title}</h1>
@@ -150,6 +154,10 @@ function BlogDetail({ user }) {
                   src={c.user?.avatar || (c.user?.username && getDefaultAvatar(c.user.username))}
                   alt={c.user?.username || '匿名'}
                   className="comment-avatar"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null
+                    e.currentTarget.src = getDefaultAvatar(c.user?.username || 'user')
+                  }}
                 />
                 <div className="comment-content-wrapper">
                   <div className="comment-header">

@@ -23,10 +23,11 @@ function Navbar({ user, setUser }) {
 
     try {
       const token = localStorage.getItem('token')
+      // ⚠️ 注意：不要手动设置 Content-Type！浏览器/axios 会自动为 FormData
+      // 设置正确的 multipart/form-data 并附带 boundary，手动设置会导致解析失败
       const res = await axios.post('/api/auth/upload-avatar', formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          Authorization: `Bearer ${token}`
         }
       })
 
@@ -37,6 +38,7 @@ function Navbar({ user, setUser }) {
       localStorage.setItem('user', JSON.stringify(updatedUser))
       setUser(updatedUser)
     } catch (err) {
+      console.error('Upload error:', err)
       alert('头像上传失败: ' + (err.response?.data?.message || err.message))
     } finally {
       setUploading(false)
@@ -68,9 +70,13 @@ function Navbar({ user, setUser }) {
                     src={user.avatar || getDefaultAvatar(user.username)}
                     alt={user.username}
                     className="user-avatar"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null
+                      e.currentTarget.src = getDefaultAvatar(user.username)
+                    }}
                   />
                   {showAvatarMenu && (
-                    <div className="avatar-menu">
+                    <div className="avatar-menu" onClick={(e) => e.stopPropagation()}>
                       <label className="avatar-upload-label">
                         {uploading ? '上传中...' : '📷 更换头像'}
                         <input

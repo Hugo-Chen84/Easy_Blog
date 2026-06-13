@@ -55,9 +55,9 @@ app.use('/api/blogs', blogRoutes)
 const distPath = path.join(__dirname, '..', 'frontend', 'dist')
 app.use(express.static(distPath))
 
-// 处理 SPA 路由 - 所有非 API 请求返回 index.html
+// 处理 SPA 路由 - 所有非 API、非静态文件请求返回 index.html
 app.get('*', (req, res, next) => {
-  if (req.path.startsWith('/api')) {
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
     return next()
   }
   res.sendFile(path.join(distPath, 'index.html'))
