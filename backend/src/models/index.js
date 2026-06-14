@@ -1,3 +1,4 @@
+import path from 'path';
 import { Sequelize } from 'sequelize'
 import User from './User.js'
 import Blog from './Blog.js'
@@ -7,7 +8,7 @@ import Like from './Like.js'
 // 使用 SQLite 数据库
 export const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite',
+  storage: path.join(path.dirname(new URL(import.meta.url).pathname), '../../database.sqlite'),
   logging: false
 })
 
