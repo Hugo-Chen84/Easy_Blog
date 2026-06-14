@@ -164,17 +164,18 @@ const seedWelcomePost = async () => {
   }
 }
 
-// 数据库同步 + 启动
-sequelize.sync({ alter: true }).then(async () => {
+// 数据库同步 + 启动（幂等、容错）
+sequelize.sync().then(async () => {
   console.log('✅ 数据库结构同步完成')
-  await ensureColumns()
-  await seedWelcomePost()
+  try { await ensureColumns() } catch (e) {}
+  try { await seedWelcomePost() } catch (e) {}
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 服务器运行在 http://localhost:${PORT}`)
   })
 }).catch(err => {
-  console.error('❌ 数据库初始化失败:', err.message)
-  // 即使有错误也尝试启动（有时只是 alter 警告）
+  console.error('❌ 数据库启动失败:', err.message)
+  try { await ensureColumns() } catch (e) {}
+  try { await seedWelcomePost() } catch (e) {}
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`⚠️  服务器以受限模式运行在 http://localhost:${PORT}`)
   })

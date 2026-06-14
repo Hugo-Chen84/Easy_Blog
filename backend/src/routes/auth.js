@@ -10,6 +10,24 @@ const JWT_SECRET = 'your-secret-key-change-in-production'
 // 从环境变量读取 GitHub Client ID（未配置则关闭功能）
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || ''
 
+// 带重试的 GitHub API 调用（解决阿里云网络不稳定问题）
+const githubFetch = async (url, options = {}, maxRetries = 3) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+      const res = await fetch(url, { ...options, signal: controller.signal })
+      clearTimeout(timeoutId)
+      return res
+    } catch (err) {
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, attempt * 1000))
+      }
+    }
+  }
+  throw new Error(`GitHub API 请求失败（已重试 ${maxRetries} 次）`)
+}
+
 // 生成默认头像 URL（基于用户名）
 const getDefaultAvatar = (username) => {
   return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(username)}`
@@ -35,7 +53,7 @@ router.post('/github/device-code', async (req, res) => {
     if (!GITHUB_CLIENT_ID) {
       return res.status(503).json({ message: '管理员未配置 GitHub 登录（需设置 GITHUB_CLIENT_ID 环境变量）' })
     }
-    const githubRes = await fetch('https://github.com/login/device/code', {
+    const githubRes = await githubFetch('https://github.com/login/device/code', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -78,7 +96,7 @@ router.post('/github/poll', async (req, res) => {
     if (!deviceCode) {
       return res.status(400).json({ message: '缺少 deviceCode' })
     }
-    const githubRes = await fetch('https://github.com/login/oauth/access_token', {
+    const githubRes = await githubFetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -97,7 +115,7 @@ router.post('/github/poll', async (req, res) => {
       // 从 GitHub API 获取用户信息
       let githubUser
       try {
-        const userRes = await fetch('https://api.github.com/user', {
+        const userRes = await githubFetch('https://api.github.com/user', {
           headers: {
             'Authorization': `Bearer ${data.access_token}`,
             'Accept': 'application/json',
