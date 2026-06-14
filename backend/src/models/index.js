@@ -1,13 +1,18 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { Sequelize } from 'sequelize'
 import User from './User.js'
 import Blog from './Blog.js'
 import Comment from './Comment.js'
 import Like from './Like.js'
 
-// 使用 SQLite 数据库
+// 使用 SQLite 数据库（绝对路径，不依赖 process.cwd()）
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 export const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './data/database.sqlite',
+  storage: path.join(__dirname, '../data/database.sqlite'),
   logging: false
 })
 
