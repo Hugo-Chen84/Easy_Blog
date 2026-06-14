@@ -7,3 +7,4 @@ backend/database.sqlite
 *.sqlite
 .vite/
 backend/uploads/
+backend/data/

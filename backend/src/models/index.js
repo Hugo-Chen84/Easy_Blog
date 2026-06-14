@@ -7,7 +7,7 @@ import Like from './Like.js'
 // 使用 SQLite 数据库
 export const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite',
+  storage: './data/database.sqlite',
   logging: false
 })
 

@@ -27,6 +27,10 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true })
 if (!fs.existsSync(avatarsDir)) fs.mkdirSync(avatarsDir, { recursive: true })
 if (!fs.existsSync(blogImagesDir)) fs.mkdirSync(blogImagesDir, { recursive: true })
 
+// 数据库目录（Docker volume 挂载点）
+const dataDir = path.join(__dirname, 'data')
+if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
+
 // 把上传目录路径暴露给路由层（路由层通过 app.get 读取）
 app.set('uploadsDir', uploadsDir)
 app.set('blogImagesDir', blogImagesDir)
