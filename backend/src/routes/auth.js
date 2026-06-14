@@ -33,7 +33,7 @@ router.get('/github-config', async (req, res) => {
 router.post('/github/device-code', async (req, res) => {
   try {
     if (!GITHUB_CLIENT_ID) {
-      return res.status(503).json({ message: '管理员未配置 GitHub 登录（GITHUB_CLIENT_ID')
+      return res.status(503).json({ message: '管理员未配置 GitHub 登录（需设置 GITHUB_CLIENT_ID 环境变量）' })
     }
     const githubRes = await fetch('https://github.com/login/device/code', {
       method: 'POST',
